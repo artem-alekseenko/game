@@ -1,10 +1,11 @@
-class Cell {
+import config from '../../config';
+export default class Cell {
     constructor(puzzle, index) {
 
         this.isEmpty = false;
         this.index = index;
         this.puzzle = puzzle;
-        this.width = maxWidthPuzzle / this.puzzle.dimension;
+        this.width = this.puzzle.maxWidth / this.puzzle.dimension;
         this.height = this.width;
 
         this.el = this.createDiv();
@@ -23,8 +24,7 @@ class Cell {
         const div = document.createElement('div');
         div.classList.add('cell');
         // div.style.backgroundSize = `${this.puzzle.width}px ${this.puzzle.height}px`;
-        div.style.backgroundSize = `${this.puzzle.width}px ${this.puzzle.height}px`;;
-
+        div.style.backgroundSize = `${this.puzzle.maxWidth}px ${this.puzzle.maxWidth}px`;;
         div.onclick = () => {
 
             const currentCellIndex = this.puzzle.findPosition(this.index);
@@ -45,7 +45,7 @@ class Cell {
                 this.el.classList.add('shake');
                 setTimeout(() => {
                     this.el.classList.remove('shake')
-                }, canNotMoveAnimationDuration);
+                }, config.animation.errorDuration);
             }
         };
 
@@ -60,7 +60,7 @@ class Cell {
         this.el.style.width = `${this.width}px`;
         this.el.style.height = `${this.height}px`;
 
-        this.el.style.backgroundImage = `url(${this.puzzle.imageSrc})`;
+        this.el.style.backgroundImage = `url(${config.urlImage})`;
         this.el.style.backgroundPosition = `-${left}px -${top}px`;
     }
 
@@ -81,7 +81,7 @@ class Cell {
     }
 
     animate(position, currentPosition, destination) {
-        const animationDuration = moveAnimationDuration;
+        const animationDuration = config.animation.movementDuration;
         const frameRate = 10;
         let step = frameRate * Math.abs((destination - currentPosition)) / animationDuration;
 

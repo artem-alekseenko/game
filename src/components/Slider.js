@@ -1,8 +1,8 @@
-class SliderView {
-
-    constructor(el, eventEmitter) {
+export default class Slider {
+    constructor(el, eventEmitter, dimension) {
         this.el = el;
         this.eventEmitter = eventEmitter;
+        this.setDimension(dimension);
 
         this.init();
     }
@@ -12,8 +12,11 @@ class SliderView {
     }
 
     onMouseUp() {
-        console.log(this.el.value);
         this.eventEmitter.emitChangeDimension(this.el.value);
+    }
+
+    setDimension(value) {
+        this.el.value = value;
     }
 
     getDimension() {
