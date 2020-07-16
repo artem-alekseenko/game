@@ -42,7 +42,6 @@ export default class Cell {
         }
     }
 
-
     createDiv() {
         const div = document.createElement('div');
         div.classList.add('cell');

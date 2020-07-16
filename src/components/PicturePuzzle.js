@@ -85,7 +85,6 @@ export default class PicturePuzzle {
         return Math.floor(Math.random() * (maxNumber));
     }
 
-
     shuffle(useAnimate = false) {
         const frameTime = config.shuffleTime / (this.cells.length - 1);
 
