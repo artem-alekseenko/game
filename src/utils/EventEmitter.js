@@ -34,7 +34,7 @@ export default class EventEmitter {
     }
 
     emitChangeDimension(dimension) {
-        this.emit(CHANGE_DIMENSION, {dimension});
+        this.emit(CHANGE_DIMENSION, { dimension });
     }
 
     onChangeDimension(callback) {
@@ -60,5 +60,4 @@ export default class EventEmitter {
             this.events[eventName] = this.events[eventName].filter(eventFn => fn !== eventFn);
         }
     }
-
 }

@@ -1,6 +1,7 @@
 import AppState from '../models/AppState';
 import Cell from './Cell';
 import config from '../../config';
+
 export default class PicturePuzzle {
     constructor(puzzleElement, eventEmitter, maxWidth, state) {
         if (state.dimension === undefined) {
@@ -10,11 +11,10 @@ export default class PicturePuzzle {
         this.maxWidth = maxWidth;
         this.el = this.changeWidth(puzzleElement);
         this.eventEmitter = eventEmitter;
-        this.eventEmitter.onChangeDimension(({dimension}) => this.resetPuzzle(dimension));
+        this.eventEmitter.onChangeDimension(({ dimension }) => this.resetPuzzle(dimension));
         this.isInStartedPosition = false;
 
         this.initCells(state.cells);
-
     }
 
     changeWidth(el) {
@@ -51,11 +51,10 @@ export default class PicturePuzzle {
 
     getCellsForSave() {
         return this.cells.map((cell, position) => ({
-            position, 
+            position,
             index: cell.getTruePosition()
         }));
     }
-
 
     initCells(stateCells) {
         if (!stateCells || stateCells == undefined || stateCells.length == 0) {
@@ -66,10 +65,10 @@ export default class PicturePuzzle {
 
     restoreCells(stateCells) {
         this.cells = [];
-        stateCells.forEach(({position, index}) => {
+        stateCells.forEach(({ position, index }) => {
             this.cells[position] = new Cell(this, index);
         });
-        stateCells.forEach(({position, index}) => {
+        stateCells.forEach(({ position, index }) => {
             this.cells[position].setPosition(position);
         });
     }
@@ -89,17 +88,12 @@ export default class PicturePuzzle {
 
     shuffle(useAnimate = false) {
         const frameTime = config.shuffleTime / (this.cells.length - 1);
-        // setInterval(() => {
-        //     for (let firstCellPosition = this.cells.length - 1; firstCellPosition > 0; firstCellPosition--) {
-        //         const secondCellPosition = this.getRandomNumber(firstCellPosition+1);
-        //         this.moveCells(firstCellPosition, secondCellPosition);
-        //     }
-        // }, frameTime);
+
         for (let firstCellPosition = this.cells.length - 1; firstCellPosition > 0; firstCellPosition--) {
-            const secondCellPosition = this.getRandomNumber(firstCellPosition+1);
+            const secondCellPosition = this.getRandomNumber(firstCellPosition + 1);
             setTimeout(
                 () => this.moveCells(firstCellPosition, secondCellPosition),
-                frameTime*firstCellPosition
+                frameTime * firstCellPosition
             );
         }
         while (this.isFinished()) {
@@ -108,14 +102,14 @@ export default class PicturePuzzle {
     }
 
     swapRandomCells() {
-        const firstCellPosition = this.getRandomNumber(this.cells.length -1);
-        const secondCellPosition = this.getRandomNumber(this.cells.length -1);
+        const firstCellPosition = this.getRandomNumber(this.cells.length - 1);
+        const secondCellPosition = this.getRandomNumber(this.cells.length - 1);
         this.moveCells(firstCellPosition, secondCellPosition);
     }
 
     moveCells(i, j, useAnimate = false, isManualShift = false) {
         if (isManualShift && this.isInStartedPosition) {
-            this.isInStartedPosition =false;
+            this.isInStartedPosition = false;
             this.onManualChangePuzzle();
         }
 

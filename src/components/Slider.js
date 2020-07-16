@@ -6,7 +6,7 @@ export default class Slider {
         this.prevValue = this.el.value;
         this.init();
     }
-    
+
     init() {
         this.el.onmouseup = () => this.onMouseUp();
     }

@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="main.css">
-    <title>Blank</title>
-  </head>
-  <body>
-    <div class="main">
-      <div class="slidercontainer">
-        <input type="range" min="2" max="10" value="7" class="slider" id="slider">
-      </div>
 
-      <div id="puzzle-wrapper">
-        <div style="position: relative; margin: 0 auto;" id="puzzle" class="cell"></div>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="main.css">
+  <title>Blank</title>
+</head>
+
+<body>
+
+  <div class="main">
+
+    <div class="slidercontainer">
+      <input type="range" min="5" max="10" value="7" class="slider" id="slider">
     </div>
-    
-    <script src="/dist/bundle.js"></script>
-  </body>
+
+    <div id="puzzle-wrapper">
+      <div id="puzzle" class="cells"></div>
+    </div>
+
+  </div>
+
+  <script src="/dist/bundle.js"></script>
+
+</body>
+
 </html>

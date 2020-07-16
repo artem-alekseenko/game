@@ -19,7 +19,7 @@ export default class StateLoader {
         return null;
     }
 
-    saveToLocalStorage (state) {
+    saveToLocalStorage(state) {
         window.localStorage[STORAGE_KEY] = JSON.stringify(state);
     }
 
@@ -27,8 +27,7 @@ export default class StateLoader {
         delete window.localStorage[STORAGE_KEY];
     }
 
-  
-    saveToHistory (state) {
+    saveToHistory(state) {
         history.pushState(state, 'history', '#hash' + state.dimension + Date.now() +
             Math.floor(Math.random() * 1000));
     }
@@ -40,12 +39,10 @@ export default class StateLoader {
         this.eventEmitter.emitPreviousState(event.state);
     }
 
-
     getState(defaultDimension) {
         const state = this.loadFromLocalStorage();
         if (state && state.dimension && state.cells) {
-           
-           return state;
+            return state;
         }
         return this.getDefaultState(defaultDimension);
     }
