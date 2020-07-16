@@ -1,10 +1,28 @@
 const CHANGE_DIMENSION = 'changeDimension';
 const CHANGE_STATE = 'changeState';
+const SUCCESS_PUZZLE = 'successPuzzle';
+const PREVIOUS_STATE = 'previousState';
 
 export default class EventEmitter {
 
     constructor() {
         this.events = {};
+    }
+
+    emitPreviousState(state) {
+        this.emit(PREVIOUS_STATE, state);
+    }
+
+    onPreviousState(callback) {
+        this.subscribe(PREVIOUS_STATE, callback);
+    }
+
+    emitSucccesPuzzle(state) {
+        this.emit(SUCCESS_PUZZLE, state);
+    }
+
+    onSuccessPuzzle(callback) {
+        this.subscribe(SUCCESS_PUZZLE, callback);
     }
 
     emitChangeState(state) {

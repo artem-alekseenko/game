@@ -1,14 +1,32 @@
 import Slider from './components/Slider'
 import PicturePuzzle from './components/PicturePuzzle'
-import stateLoader from './utils/stateLoader'
-import EventEmiiter from './components/EventEmitter'
+import EventEmiiter from './utils/EventEmitter'
+import StateLoader from './utils/StateLoader'
 import config from '../config'
 
 export default class App {
     constructor() {
-        this.eventEmitter = new EventEmiiter();
         this.slider = null;
         this.puzzle = null;
+
+        this.eventEmitter = new EventEmiiter();
+        this.stateLoader = new StateLoader(this.eventEmitter);
+  
+        this.eventEmitter.onChangeState(() => this.saveCurrentState());
+        this.eventEmitter.onSuccessPuzzle(() => this.onSuccessPuzzle());
+        this.eventEmitter.onPreviousState((state) => this.onBackHistory(state));
+    }
+
+    onSuccessPuzzle() {
+        if (!this.puzzle) {
+            return;
+        }
+        this.puzzle.resetPuzzle();
+    }
+
+    clearPuzzle() {
+        this.puzzle.clearState();
+        this.stateLoader.clearLocalStorage();
     }
 
 
@@ -20,13 +38,10 @@ export default class App {
     }
 
     render(puzzleElement, sliderElement) {
-        const state = stateLoader.getState(config.dimension);
+        const state = this.stateLoader.getState(config.dimension);
 
         this.slider = this.renderSlider(sliderElement, state.dimension);
         this.puzzle = this.renderPuzzle(puzzleElement, state);
-
-        stateLoader.onBackHistory((state) => this.setState(state));
-        this.eventEmitter.onChangeState(() => this.saveCurrentState());
     }
 
     renderPuzzle(puzzleElement, state) {
@@ -42,11 +57,11 @@ export default class App {
             return;
         }
         const state = this.puzzle.getState();
-        stateLoader.saveToLocalStorage(state);
-        stateLoader.saveToHistory(state);
+        this.stateLoader.saveToLocalStorage(state);
+        this.stateLoader.saveToHistory(state);
     }
 
-    setState(state) {
+    onBackHistory(state) {
         if (state.dimension == undefined) {
             return;
         }

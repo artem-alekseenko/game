@@ -4,16 +4,28 @@
   box-sizing: border-box;
 }
 
+body {
+    background-color: #F9F9FB;
+}
+
 .main {
     padding-top: 40px;
     max-width: 400px;
     margin: auto;
 }
 
+#puzzle-wrapper {    
+    background-color: #D0D0D0;
+}
+
 .cell {
     position: absolute;
     border: 1px solid #FFF;
     border-radius: 3px;    
+}
+
+.slidercontainer {
+    padding-bottom: 15px;
 }
 
 @-webkit-keyframes shake {

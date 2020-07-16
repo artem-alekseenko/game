@@ -1,62 +1,64 @@
 import AppState from '../models/AppState';
 import Cell from './Cell';
+import config from '../../config';
 export default class PicturePuzzle {
-    constructor(parentEl, eventEmitter, maxWidth, state) {
+    constructor(puzzleElement, eventEmitter, maxWidth, state) {
+        if (state.dimension === undefined) {
+            throw new Error('Dimension undefined in state');
+        }
         this.dimension = state.dimension;
         this.maxWidth = maxWidth;
-        this.el = this.renderWrapper(parentEl);
+        this.el = this.changeWidth(puzzleElement);
         this.eventEmitter = eventEmitter;
-        this.eventEmitter.onChangeDimension(({dimension}) => this.changeDimension(dimension));
-        this.isDirty = false;
+        this.eventEmitter.onChangeDimension(({dimension}) => this.resetPuzzle(dimension));
+        this.isInStartedPosition = false;
 
         this.initCells(state.cells);
 
     }
 
-    renderWrapper(parentEl) {
-        const div = document.createElement('div');
-        div.style.position = 'relative';
-        div.style.maxWidth = `${this.maxWidth}`;
-        div.style.margin = '0 auto';
-        div.classList.add('cell');
-        div.style.width = `${this.maxWidth}px`;
-        div.style.height = `${this.maxWidth}px`;
-        parentEl.appendChild(div);
-        return div;
+    changeWidth(el) {
+        el.style.maxWidth = `${this.maxWidth}`;
+        el.style.width = `${this.maxWidth}px`;
+        el.style.height = `${this.maxWidth}px`;
+        return el;
     }
 
-    changeDimension(dimension) {
-        this.setState(new AppState(dimension));
-    }
-
-    setState(state) {
-        this.isDirty = false;
-        this.dimension = state.dimension;
-        this.removeCells();
-        this.initCells(state.cells);
+    resetPuzzle(inputDimension) {
+        const newDimension = inputDimension || this.dimension;
+        this.setState(new AppState(newDimension));
     }
 
     removeCells() {
-        this.cells.forEach(cell => cell.el.remove());
-    }
-
-    getCellsForSave() {
-        return this.cells.map((cell, position) => ({
-            position, 
-            index: cell.index
-        }));
-    }
-
-    saveState() {
-        this.eventEmitter.emitChangeState(this.getState());
+        this.cells.forEach(cell => cell.el.remove());;
+        this.cells = [];
     }
 
     getState() {
         return new AppState(this.dimension, this.getCellsForSave());
     }
 
+    setState(state) {
+        this.removeCells();
+        this.isInStartedPosition = false;
+        this.dimension = state.dimension;
+        this.initCells(state.cells);
+    }
+
+    onManualChangePuzzle() {
+        this.eventEmitter.emitChangeState(this.getState());
+    }
+
+    getCellsForSave() {
+        return this.cells.map((cell, position) => ({
+            position, 
+            index: cell.getTruePosition()
+        }));
+    }
+
+
     initCells(stateCells) {
-        if (!stateCells || stateCells == undefined) {
+        if (!stateCells || stateCells == undefined || stateCells.length == 0) {
             return this.createCells();
         }
         this.restoreCells(stateCells);
@@ -77,49 +79,66 @@ export default class PicturePuzzle {
         for (let position = 0; position < this.dimension * this.dimension; position++) {
             this.cells.push(new Cell(this, position));
         };
-        this.shuffle();
+        setTimeout(() => this.shuffle(true), config.showFullPuzzleOnStartTime);
+    }
+
+    getRandomNumber(maxNumber, deniedNumber) {
+        return Math.floor(Math.random() * (maxNumber));
     }
 
 
-    shuffle() {
-        for (let i = this.cells.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            this.moveCells(i, j);
-        }
-    }
-
-    moveCells(i, j, animate) {
-        if (animate !== undefined && !this.isDirty) {
-            this.saveState();
-            this.isDirty =true;
-        }
-        this.cells[i].setPosition(j, animate, i);
-        this.cells[j].setPosition(i);
-        [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
-        if (animate !== undefined) {
-            this.saveState();
-        }
-        if (this.isFinished()) {
-            console.log('The end');
-        }
-        // if (!this.shuffling && this.isFinished()) {
-        //     if (this.onFinished && typeof this.onFinished === 'function') {
-        //         this.onFinished.call(this);
+    shuffle(useAnimate = false) {
+        const frameTime = config.shuffleTime / (this.cells.length - 1);
+        // setInterval(() => {
+        //     for (let firstCellPosition = this.cells.length - 1; firstCellPosition > 0; firstCellPosition--) {
+        //         const secondCellPosition = this.getRandomNumber(firstCellPosition+1);
+        //         this.moveCells(firstCellPosition, secondCellPosition);
         //     }
-        // }
+        // }, frameTime);
+        for (let firstCellPosition = this.cells.length - 1; firstCellPosition > 0; firstCellPosition--) {
+            const secondCellPosition = this.getRandomNumber(firstCellPosition+1);
+            setTimeout(
+                () => this.moveCells(firstCellPosition, secondCellPosition),
+                frameTime*firstCellPosition
+            );
+        }
+        while (this.isFinished()) {
+            this.swapRandomCells();
+        }
+    }
+
+    swapRandomCells() {
+        const firstCellPosition = this.getRandomNumber(this.cells.length -1);
+        const secondCellPosition = this.getRandomNumber(this.cells.length -1);
+        this.moveCells(firstCellPosition, secondCellPosition);
+    }
+
+    moveCells(i, j, useAnimate = false, isManualShift = false) {
+        if (isManualShift && this.isInStartedPosition) {
+            this.isInStartedPosition =false;
+            this.onManualChangePuzzle();
+        }
+
+        this.cells[i].setPosition(j, useAnimate, i);
+        this.cells[j].setPosition(i);
+
+        [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
+        if (isManualShift) {
+            this.onManualChangePuzzle();
+        }
+        if (!this.isInStartedPosition && this.isFinished()) {
+            this.eventEmitter.emitSucccesPuzzle();
+        }
     }
 
     isFinished() {
-        for (let i = 0; i < this.cells.length; i++) {
-            if (i !== this.cells[i].index) {
-                return false;
-            }
-        }
-        return true;
+        return !this.cells.some((cell, position) => {
+            return cell.getTruePosition() != position;
+        });
     }
 
     findPosition(index) {
-        return this.cells.findIndex(cell => cell.index === index);
+        return this.cells.findIndex(cell => cell.getTruePosition() === index);
     }
 
     findEmpty() {

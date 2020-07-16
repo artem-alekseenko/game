@@ -9,10 +9,13 @@
   </head>
   <body>
     <div class="main">
-      <div class="slidecontainer">
-        <input type="range" min="5" max="10" value="7" class="slider" id="slider">
+      <div class="slidercontainer">
+        <input type="range" min="2" max="10" value="7" class="slider" id="slider">
       </div>
-      <div id="puzzle-wrapper"></div>
+
+      <div id="puzzle-wrapper">
+        <div style="position: relative; margin: 0 auto;" id="puzzle" class="cell"></div>
+      </div>
     </div>
     
     <script src="/dist/bundle.js"></script>
