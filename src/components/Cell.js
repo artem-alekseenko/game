@@ -66,14 +66,14 @@ export default class Cell {
     setPosition(destinationIndex, animate, currentIndex) {
         const { left, top } = this.getPositionFromIndex(destinationIndex);
         if (animate) {
-            this.shiftWithAnimation(left, top);
+            this.shiftWithAnimation(currentIndex, left, top);
         } else {
             this.el.style.left = `${left}px`;
             this.el.style.top = `${top}px`;
         }
     }
 
-    shiftWithAnimation(left, top) {
+    shiftWithAnimation(currentIndex, left, top) {
         const { left: currentLeft, top: currentTop } = this.getPositionFromIndex(currentIndex);
         if (left !== currentLeft) {
             this.startShiftAnimation('left', currentLeft, left);
